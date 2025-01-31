@@ -1,25 +1,56 @@
-﻿namespace Maui_app
+﻿using System;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.ApplicationModel.Communication;
+
+namespace Maui_app
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
+        string translatedNumber;
 
         public MainPage()
         {
             InitializeComponent();
         }
 
-        private void OnCounterClicked(object sender, EventArgs e)
+        private void OnTranslate(object sender, EventArgs e)
         {
-            count += 5;
-            //prueba
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
+            string enteredNumber = PhoneNumberText.Text;
+            translatedNumber = PhonewordTranslator.ToNumber(enteredNumber);
 
-            SemanticScreenReader.Announce(CounterBtn.Text);
+            if (!string.IsNullOrEmpty(translatedNumber))
+            {
+                CallButton.IsEnabled = true;
+                CallButton.Text = "Call " + translatedNumber;
+            }
+            else
+            {
+                CallButton.IsEnabled = false;
+                CallButton.Text = "Call";
+            }
+        }
+
+        async void OnCall(object sender, EventArgs e)
+        {
+            if (await DisplayAlert("Dial a Number",
+                                   "Would you like to call " + translatedNumber + "?",
+                                   "Yes",
+                                   "No"))
+            {
+                try
+                {
+                    if (PhoneDialer.Default.IsSupported)
+                        PhoneDialer.Default.Open(translatedNumber);
+                }
+                catch (ArgumentNullException)
+                {
+                    await DisplayAlert("Unable to dial", "Phone number was not valid.", "OK");
+                }
+                catch (Exception)
+                {
+                    await DisplayAlert("Unable to dial", "Phone dialing failed.", "OK");
+                }
+            }
         }
     }
-
 }
