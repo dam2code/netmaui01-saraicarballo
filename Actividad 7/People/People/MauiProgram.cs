@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Controls.Hosting;
+using Microsoft.Maui.Hosting;
 
 namespace People;
 
@@ -19,7 +21,10 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
+        // Obtener la ruta local de la base de datos
         string dbPath = FileAccessHelper.GetLocalFilePath("people.db3");
+
+        // Registrar PersonRepository como un servicio singleton
         builder.Services.AddSingleton<PersonRepository>(s => ActivatorUtilities.CreateInstance<PersonRepository>(s, dbPath));
 
         return builder.Build();
