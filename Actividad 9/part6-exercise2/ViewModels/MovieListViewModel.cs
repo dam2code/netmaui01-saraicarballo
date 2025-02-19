@@ -1,10 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 
 namespace MovieCatalog.ViewModels;
 
-public class MovieListViewModel: ObservableObject
+public class MovieListViewModel : ObservableObject
 {
     private MovieViewModel? _selectedMovie;
 
@@ -16,8 +17,13 @@ public class MovieListViewModel: ObservableObject
 
     public ObservableCollection<MovieViewModel> Movies { get; set; }
 
-    public MovieListViewModel() =>
-        Movies = [];
+    public ICommand DeleteMovieCommand { get; private set; }
+
+    public MovieListViewModel()
+    {
+        Movies = new ObservableCollection<MovieViewModel>();
+        DeleteMovieCommand = new Command<MovieViewModel>(DeleteMovie);
+    }
 
     public async Task RefreshMovies()
     {
